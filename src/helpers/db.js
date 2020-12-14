@@ -2,6 +2,7 @@ const config = require("../config");
 const mysql = require("mysql2/promise");
 const { Sequelize } = require("sequelize");
 const { userModel } = require("../models/userModel");
+const { feedbackModel } = require("../models/feedbackModel");
 module.exports = db = {};
 
 initialize();
@@ -33,6 +34,7 @@ async function initialize() {
 
   // init models and add them to the exported db object
   db.User = userModel(sequelize);
+  db.FeedBack = feedbackModel(sequelize);
 
   // sync all models with database
   await sequelize.sync();

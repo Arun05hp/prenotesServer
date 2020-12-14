@@ -13,7 +13,6 @@ function model(sequelize) {
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      primaryKey: true,
       unique: true,
     },
     password: { type: DataTypes.STRING, allowNull: false },
@@ -21,7 +20,6 @@ function model(sequelize) {
     mno: {
       type: DataTypes.STRING,
       allowNull: false,
-      primaryKey: true,
       unique: true,
     },
     institute: { type: DataTypes.INTEGER, allowNull: false },
@@ -34,7 +32,16 @@ function model(sequelize) {
     hostelAddress: { type: DataTypes.STRING, allowNull: true },
   };
 
-  const options = {};
+  const options = {
+    defaultScope: {
+      // exclude hash by default
+      attributes: { exclude: ["password"] },
+    },
+    scopes: {
+      // include hash with this scope
+      withHash: { attributes: {} },
+    },
+  };
 
   return sequelize.define("users", attributes, options);
 }
@@ -59,6 +66,42 @@ function validateUser(user) {
   return schema.validate(user);
 }
 
+function validateProfile(data) {
+  const schema = Joi.object({
+    name: Joi.string().min(2).max(50).required(),
+    dob: Joi.date().required(),
+    email: Joi.string().min(5).max(100).required().email(),
+    gender: Joi.string().required(),
+    mno: Joi.string().min(10).required(),
+  });
+
+  return schema.validate(data);
+}
+
+function validateEdu(data) {
+  const schema = Joi.object({
+    institute: Joi.number().integer().required(),
+    branch: Joi.number().integer().required(),
+    sem: Joi.number().integer().required(),
+    batchStart: Joi.date().required(),
+    batchEnd: Joi.date().required(),
+    regno: Joi.string().min(2).max(50).required(),
+    hosteler: Joi.number().integer().required(),
+  });
+
+  return schema.validate(data);
+}
+
+function validateChangePwd(data) {
+  const schema = Joi.object({
+    iduser: Joi.number().required(),
+    oldPassword: Joi.string().min(4).max(255).required(),
+    newPassword: Joi.string().min(4).max(255).required(),
+  });
+
+  return schema.validate(data);
+}
+
 function auth(user) {
   const schema = Joi.object({
     email: Joi.string().min(5).max(100).required().email(),
@@ -70,4 +113,7 @@ function auth(user) {
 
 module.exports.userModel = model;
 module.exports.validate = validateUser;
+module.exports.validateProfile = validateProfile;
+module.exports.validateEdu = validateEdu;
+module.exports.validateChangePwd = validateChangePwd;
 module.exports.auth = auth;
