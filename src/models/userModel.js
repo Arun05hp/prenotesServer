@@ -22,6 +22,7 @@ function model(sequelize) {
       allowNull: false,
       unique: true,
     },
+    profileImg: { type: DataTypes.STRING, allowNull: true },
     institute: { type: DataTypes.INTEGER, allowNull: false },
     branch: { type: DataTypes.INTEGER, allowNull: false },
     sem: { type: DataTypes.INTEGER, allowNull: false },

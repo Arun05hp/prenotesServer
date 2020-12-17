@@ -10,6 +10,20 @@ const {
   validateChangePwd,
 } = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const fs = require("fs");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./assets/profiles");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + req.params.id + "userprofile.jpg");
+  },
+});
+
+const upload = multer({ storage: storage }).single("photo");
+
 const router = express.Router();
 
 router.get("/userDetails/:id", async (req, res) => {
@@ -168,6 +182,37 @@ router.put("/updateEdu/:id", async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: error });
   }
+});
+
+router.post("/profile/:id", async (req, res) => {
+  upload(req, res, async (err) => {
+    const id = req.params.id;
+    console.log("iduser", id);
+    const profileImg = req.body.profileImg;
+    if (err instanceof multer.MulterError) {
+      return res.status(413).send({ error: "File Too Large" });
+    } else if (err) {
+      console.log("err", err);
+      return res.send({ error: "Something Went Wrong" });
+    }
+
+    try {
+      const user = await db.User.findByPk(id);
+      if (!user) return res.status(400).json({ message: "User not found" });
+
+      if (user.profileImg && user.profileImg != "null") {
+        const path = `./${user.profileImg}`;
+        fs.unlink(path, (err) => {
+          if (err) res.send({ error: "Something Went Wrong" });
+        });
+      }
+      user.profileImg = req.file.path;
+      await user.save();
+      res.json({ message: "Profile Image Updated Successfully" });
+    } catch (error) {
+      return res.status(500).json({ message: error });
+    }
+  });
 });
 
 module.exports = router;

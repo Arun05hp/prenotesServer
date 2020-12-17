@@ -11,6 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/user", user);
 app.use("/prenotes", feedback);
+app.use("/assets", express.static("assets"));
 app.get("/", (req, res) => {
   res.send("Welcome");
 });
