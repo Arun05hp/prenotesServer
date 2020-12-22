@@ -119,7 +119,7 @@ router.post("/changepassword", async (req, res) => {
 
   const { iduser, oldPassword, newPassword } = data;
   try {
-    const user = await db.User.findByPk(iduser);
+    const user = await db.User.scope("withHash").findByPk(iduser);
     if (!user) return res.status(400).json({ message: "User not found" });
 
     if (!(await bcrypt.compare(oldPassword, user.password))) {

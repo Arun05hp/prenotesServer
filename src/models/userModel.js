@@ -88,6 +88,7 @@ function validateEdu(data) {
     batchEnd: Joi.date().required(),
     regno: Joi.string().min(2).max(50).required(),
     hosteler: Joi.number().integer().required(),
+    hostelAddress: Joi.string().allow(null),
   });
 
   return schema.validate(data);
