@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const user = require("./routes/user");
 const upload = require("./routes/uploads");
 const exampaper = require("./routes/exampaper");
+const notification = require("./routes/notification");
 const feedback = require("./routes/feedback");
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(bodyParser.json());
 app.use("/user", user);
 app.use("/upload", upload);
 app.use("/exam", exampaper);
+app.use("/notification", notification);
 app.use("/prenotes", feedback);
 app.use("/assets", express.static("assets"));
 app.get("/", (req, res) => {

@@ -92,9 +92,7 @@ router.get("/allNotes", async (req, res) => {
 
 router.get("/allBooks", async (req, res) => {
   try {
-    const books = await db.Books.findAll({
-      attributes: { exclude: ["iduser"] },
-    });
+    const books = await db.Books.findAll();
 
     if (books.length < 1) return res.status(400).json({ message: "No Data" });
     return res.json({
