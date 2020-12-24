@@ -78,6 +78,26 @@ router.get("/allexampaper", async (req, res) => {
   }
 });
 
+router.get("/exampaper/:iduser", async (req, res) => {
+  const id = req.params.iduser;
+  console.log(id);
+  try {
+    const exam = await db.Exam.findAll({
+      where: {
+        iduser: id,
+      },
+    });
+
+    if (exam.length < 1) return res.status(400).json({ message: "No Data" });
+    return res.json({
+      message: "Success",
+      examData: exam,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+});
+
 router.post("/exampaper", async (req, res) => {
   upload(req, res, async (err) => {
     const { error } = validateExam(req.body);

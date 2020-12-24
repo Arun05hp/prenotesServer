@@ -90,6 +90,22 @@ router.get("/allNotes", async (req, res) => {
   }
 });
 
+router.get("/allBooks", async (req, res) => {
+  try {
+    const books = await db.Books.findAll({
+      attributes: { exclude: ["iduser"] },
+    });
+
+    if (books.length < 1) return res.status(400).json({ message: "No Data" });
+    return res.json({
+      message: "Success",
+      booksData: books,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+});
+
 router.get("/notes/:iduser", async (req, res) => {
   const id = req.params.iduser;
   console.log(id);
