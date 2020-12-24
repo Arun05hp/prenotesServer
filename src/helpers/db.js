@@ -5,6 +5,7 @@ const { userModel } = require("../models/userModel");
 const { feedbackModel } = require("../models/feedbackModel");
 const { notesModel } = require("../models/notesModal");
 const { booksModel } = require("../models/booksModal");
+const { examModel } = require("../models/examModal");
 module.exports = db = {};
 
 initialize();
@@ -39,6 +40,7 @@ async function initialize() {
   db.FeedBack = feedbackModel(sequelize);
   db.Notes = notesModel(sequelize);
   db.Books = booksModel(sequelize);
+  db.Exam = examModel(sequelize);
 
   // sync all models with database
   await sequelize.sync();
