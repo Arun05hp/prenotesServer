@@ -90,11 +90,17 @@ router.get("/allNotes", async (req, res) => {
   }
 });
 
-router.get("/allBooks", async (req, res) => {
+router.get("/allBooks/:id", async (req, res) => {
   try {
-    const books = await db.Books.findAll();
+    const id = req.params.id;
+    const books = await db.Books.findAll({
+      where: {
+        iduser: {
+          [Op.ne]: id,
+        },
+      },
+    });
 
-    if (books.length < 1) return res.status(400).json({ message: "No Data" });
     return res.json({
       message: "Success",
       booksData: books,

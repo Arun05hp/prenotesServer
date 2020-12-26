@@ -7,6 +7,8 @@ const { notesModel } = require("../models/notesModal");
 const { booksModel } = require("../models/booksModal");
 const { examModel } = require("../models/examModal");
 const { notifiModel } = require("../models/notificationModal");
+const { contactModel } = require("../models/contactsModal");
+const { msgModel } = require("../models/messagesModal");
 module.exports = db = {};
 
 initialize();
@@ -27,6 +29,7 @@ async function initialize() {
   const sequelize = new Sequelize(database, user, password, {
     host,
     dialect: "mysql",
+    logging: false,
   });
 
   try {
@@ -43,6 +46,8 @@ async function initialize() {
   db.Books = booksModel(sequelize);
   db.Exam = examModel(sequelize);
   db.Notifi = notifiModel(sequelize);
+  db.Contact = contactModel(sequelize);
+  db.Msg = msgModel(sequelize);
 
   // sync all models with database
   await sequelize.sync();
