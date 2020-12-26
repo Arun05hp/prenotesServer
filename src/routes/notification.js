@@ -59,67 +59,86 @@ router.post("/notifi", async (req, res) => {
 });
 
 router.post("/accept/:id", async (req, res) => {
+  let owner = {};
+  let requester = {};
+  let roomId = uuidv4();
   try {
-    let owner = {};
     const id = req.params.id;
     const data = req.body;
     const notifi = await db.Notifi.findByPk(id);
     if (!notifi) return res.status(400).json({ message: "Not Found" });
 
-    const requester = await db.Contact.findOne({
+    requester = await db.Contact.findOne({
       where: { iduser: data.receiverId },
     });
+
     owner = await db.Contact.findOne({
       where: { iduser: data.senderId },
     });
-    console.log("owner", owner);
+
     if (!owner) {
-      let contData = [
-        {
-          iduser: data.senderId,
-          uuid: uuidv4(),
-          contacts: null,
-        },
-      ];
-      console.log("contData", contData);
+      let contData = {
+        iduser: data.senderId,
+        uuid: uuidv4(),
+        contacts: null,
+      };
       owner = await db.Contact.create(contData);
-      owner = owner.dataValues;
     }
 
-    if (owner.contacts == "" || owner.contacts == null) {
+    if (owner.dataValues.contacts == "" || owner.dataValues.contacts == null) {
+      console.log("requester", requester);
       owner.contacts = [
         {
-          id: requester.iduser,
-          uuid: requester.uuid,
+          id: requester.dataValues.iduser,
+          uuid: requester.dataValues.uuid,
+          roomId: roomId,
         },
       ];
     } else {
-      owner.contacts = [
-        ...owner.contacts,
-        {
-          id: requester.iduser,
-          uuid: requester.uuid,
-        },
-      ];
+      if (
+        owner.dataValues.contacts.filter(
+          (item) => item.id === requester.dataValues.iduser
+        ).length < 1
+      ) {
+        owner.contacts = [
+          ...owner.dataValues.contacts,
+          {
+            id: requester.dataValues.iduser,
+            uuid: requester.dataValues.uuid,
+            roomId: roomId,
+          },
+        ];
+      }
     }
 
     await owner.save();
 
-    if (requester.contacts == "" || requester.contacts == null) {
+    if (
+      requester.dataValues.contacts == "" ||
+      requester.dataValues.contacts == null
+    ) {
       requester.contacts = [
         {
-          id: owner.iduser,
-          uuid: owner.uuid,
+          id: owner.dataValues.iduser,
+          uuid: owner.dataValues.uuid,
+          roomId: roomId,
         },
       ];
     } else {
-      requester.requester = [
-        ...requester.contacts,
-        {
-          id: owner.iduser,
-          uuid: owner.uuid,
-        },
-      ];
+      if (
+        requester.dataValues.contacts.filter(
+          (item) => item.id === owner.dataValues.iduser
+        ).length < 1
+      ) {
+        requester.contacts = [
+          ...requester.dataValues.contacts,
+          {
+            id: owner.dataValues.iduser,
+            uuid: owner.dataValues.uuid,
+            roomId: roomId,
+          },
+        ];
+      }
     }
     await requester.save();
     Object.assign(notifi, data);

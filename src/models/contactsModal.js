@@ -8,17 +8,11 @@ function model(sequelize) {
       primaryKey: true,
       autoIncrement: true,
     },
-    iduser: { type: DataTypes.STRING, allowNull: false },
+    iduser: { type: DataTypes.INTEGER, allowNull: false },
     uuid: { type: DataTypes.STRING, allowNull: false },
     contacts: {
-      type: DataTypes.STRING,
+      type: DataTypes.JSON,
       allowNull: true,
-      get: function () {
-        return JSON.parse(this.getDataValue("contacts"));
-      },
-      set: function (val) {
-        return this.setDataValue("contacts", JSON.stringify(val));
-      },
     },
   };
   const options = {};

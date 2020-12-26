@@ -4,9 +4,8 @@ const Joi = require("joi");
 function model(sequelize) {
   const attributes = {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       primaryKey: true,
-      autoIncrement: true,
     },
     messages: { type: DataTypes.JSON, allowNull: false },
   };
