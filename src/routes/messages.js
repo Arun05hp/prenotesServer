@@ -2,19 +2,20 @@ const db = require("../helpers/db");
 const express = require("express");
 const router = express.Router();
 
-router.get("/contacts/:iduser", async (req, res) => {
-  const id = req.params.iduser;
+router.get("/msg/:id", async (req, res) => {
+  const id = req.params.id;
 
   try {
-    const contacts = await db.Contact.findAll({
+    const msg = await db.Msg.findAll({
+      raw: true,
       where: {
-        iduser: id,
+        id: id,
       },
     });
 
     return res.json({
       message: "Success",
-      contactsData: contacts,
+      messages: msg[0].messages,
     });
   } catch (error) {
     return res.status(500).json({ message: error });

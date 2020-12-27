@@ -23,6 +23,7 @@ app.use("/upload", upload);
 app.use("/exam", exampaper);
 app.use("/notification", notification);
 app.use("/contacts", contacts);
+app.use("/messages", messages);
 app.use("/prenotes", feedback);
 app.use("/assets", express.static("assets"));
 app.get("/", (req, res) => {
@@ -31,15 +32,11 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   const id = socket.handshake.query.id;
-  console.log("id", id);
   socket.join(id);
-
   socket.on("send-message", ({ sender, recipient, text, roomId }) => {
-    console.log("recipients", sender, recipient, text, roomId);
-
     socket.broadcast.to(recipient).emit("receive-message", {
       sender: id,
-      text,
+      text: text,
     });
     storeMsg(sender, text, roomId);
   });
