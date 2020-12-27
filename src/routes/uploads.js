@@ -41,30 +41,58 @@ const bookUpload = multer({
 
 const router = express.Router();
 
+async function fetchUserInfo(item) {
+  const userDetails = await db.User.findOne({
+    raw: true,
+    where: {
+      iduser: item.iduser,
+    },
+    attributes: ["institute"],
+  });
+
+  return { ...item, ...userDetails };
+}
+
 router.get("/searchNotes?", async (req, res) => {
   try {
     const { topic, category } = req.query;
-    console.log(req.query);
+    let notes;
+    if (category != 0)
+      notes = await db.Notes.findAll({
+        where: {
+          category: category,
 
-    const notes = await db.Notes.findAll({
-      where: {
-        category: category,
-
-        [Op.or]: [
-          {
-            description: {
-              [Op.like]: `%${topic}%`,
+          [Op.or]: [
+            {
+              description: {
+                [Op.like]: `%${topic}%`,
+              },
             },
-          },
-          {
-            topic: {
-              [Op.like]: `%${topic}%`,
+            {
+              topic: {
+                [Op.like]: `%${topic}%`,
+              },
             },
-          },
-        ],
-      },
-    });
-
+          ],
+        },
+      });
+    else
+      notes = await db.Notes.findAll({
+        where: {
+          [Op.or]: [
+            {
+              description: {
+                [Op.like]: `%${topic}%`,
+              },
+            },
+            {
+              topic: {
+                [Op.like]: `%${topic}%`,
+              },
+            },
+          ],
+        },
+      });
     return res.json({
       message: "Success",
       notesData: notes,
@@ -77,7 +105,12 @@ router.get("/searchNotes?", async (req, res) => {
 router.get("/allNotes", async (req, res) => {
   try {
     const notes = await db.Notes.findAll({
-      attributes: { exclude: ["iduser"] },
+      raw: true,
+      // where: {
+      //   iduser: {
+      //     [Op.ne]: id,
+      //   },
+      // },
     });
 
     if (notes.length < 1) return res.status(400).json({ message: "No Data" });
@@ -90,10 +123,51 @@ router.get("/allNotes", async (req, res) => {
   }
 });
 
+router.post("/searchBooks", async (req, res) => {
+  try {
+    const { text, id } = req.body;
+
+    const books = await db.Books.findAll({
+      raw: true,
+      where: {
+        iduser: {
+          [Op.ne]: id,
+        },
+        [Op.or]: [
+          {
+            bookName: {
+              [Op.like]: `%${text}%`,
+            },
+          },
+          {
+            authorName: {
+              [Op.like]: `%${text}%`,
+            },
+          },
+        ],
+      },
+    });
+
+    const promises = books.map(async (item) => {
+      return await fetchUserInfo(item);
+    });
+
+    const results = await Promise.all(promises);
+
+    return res.json({
+      message: "Success",
+      booksData: results,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+});
+
 router.get("/allBooks/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const books = await db.Books.findAll({
+      raw: true,
       where: {
         iduser: {
           [Op.ne]: id,
@@ -101,9 +175,15 @@ router.get("/allBooks/:id", async (req, res) => {
       },
     });
 
+    const promises = books.map(async (item) => {
+      return await fetchUserInfo(item);
+    });
+
+    const results = await Promise.all(promises);
+
     return res.json({
       message: "Success",
-      booksData: books,
+      booksData: results,
     });
   } catch (error) {
     return res.status(500).json({ message: error });
@@ -198,6 +278,42 @@ router.post("/book", async (req, res) => {
       return res.status(500).json({ message: error });
     }
   });
+});
+
+router.delete("/delnotes/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  try {
+    await db.Notes.destroy({
+      where: {
+        idnotes: id,
+      },
+    });
+
+    return res.json({
+      message: "Success",
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+});
+
+router.delete("/delbook/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  try {
+    await db.Books.destroy({
+      where: {
+        idbook: id,
+      },
+    });
+
+    return res.json({
+      message: "Success",
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
 });
 
 module.exports = router;

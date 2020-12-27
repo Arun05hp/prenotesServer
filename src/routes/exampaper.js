@@ -156,4 +156,22 @@ router.post("/uploadsolution/:id", async (req, res) => {
   });
 });
 
+router.delete("/delpaper/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  try {
+    await db.Exam.destroy({
+      where: {
+        idexam: id,
+      },
+    });
+
+    return res.json({
+      message: "Success",
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+});
+
 module.exports = router;

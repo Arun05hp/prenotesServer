@@ -86,7 +86,6 @@ router.post("/accept/:id", async (req, res) => {
     }
 
     if (owner.dataValues.contacts == "" || owner.dataValues.contacts == null) {
-      console.log("requester", requester);
       owner.contacts = [
         {
           id: requester.dataValues.iduser,
