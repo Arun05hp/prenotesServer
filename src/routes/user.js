@@ -9,7 +9,7 @@ const {
   validateEdu,
   validateChangePwd,
 } = require("../models/userModel");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const fs = require("fs");
 const multer = require("multer");
 
