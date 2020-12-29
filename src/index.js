@@ -11,6 +11,7 @@ const upload = require("./routes/uploads");
 const exampaper = require("./routes/exampaper");
 const notification = require("./routes/notification");
 const contacts = require("./routes/contacts");
+const tutor = require("./routes/tutor");
 const { messages, storeMsg } = require("./routes/messages");
 const feedback = require("./routes/feedback");
 
@@ -23,6 +24,7 @@ app.use("/upload", upload);
 app.use("/exam", exampaper);
 app.use("/notification", notification);
 app.use("/contacts", contacts);
+app.use("/tutor", tutor);
 app.use("/messages", messages);
 app.use("/prenotes", feedback);
 app.use("/assets", express.static("assets"));

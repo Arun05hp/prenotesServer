@@ -9,6 +9,7 @@ const { examModel } = require("../models/examModal");
 const { notifiModel } = require("../models/notificationModal");
 const { contactModel } = require("../models/contactsModal");
 const { msgModel } = require("../models/messagesModal");
+const { tutorModal } = require("../models/tutorModal");
 module.exports = db = {};
 
 initialize();
@@ -48,6 +49,7 @@ async function initialize() {
   db.Notifi = notifiModel(sequelize);
   db.Contact = contactModel(sequelize);
   db.Msg = msgModel(sequelize);
+  db.Tutor = tutorModal(sequelize);
 
   // sync all models with database
   await sequelize.sync();
