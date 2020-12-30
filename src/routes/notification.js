@@ -2,9 +2,10 @@ const db = require("../helpers/db");
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
 const { validate } = require("../models/notificationModal");
+const requireAuth = require("../middlewares/auth");
 const router = express.Router();
 
-router.get("/notifi/:iduser", async (req, res) => {
+router.get("/notifi/:iduser", requireAuth, async (req, res) => {
   const id = req.params.iduser;
 
   try {
@@ -23,7 +24,7 @@ router.get("/notifi/:iduser", async (req, res) => {
   }
 });
 
-router.post("/notifi", async (req, res) => {
+router.post("/notifi", requireAuth, async (req, res) => {
   const data = req.body;
   const { error } = validate(data);
   if (error) return res.status(400).json({ message: error.details[0].message });
@@ -58,7 +59,7 @@ router.post("/notifi", async (req, res) => {
   }
 });
 
-router.post("/accept/:id", async (req, res) => {
+router.post("/accept/:id", requireAuth, async (req, res) => {
   let owner = {};
   let requester = {};
   let roomId = uuidv4();
@@ -149,7 +150,7 @@ router.post("/accept/:id", async (req, res) => {
   }
 });
 
-router.post("/reject/:id", async (req, res) => {
+router.post("/reject/:id", requireAuth, async (req, res) => {
   try {
     const id = req.params.id;
     const data = req.body;
@@ -165,7 +166,7 @@ router.post("/reject/:id", async (req, res) => {
   }
 });
 
-router.delete("/clear/:id", async (req, res) => {
+router.delete("/clear/:id", requireAuth, async (req, res) => {
   try {
     const id = req.params.id;
 

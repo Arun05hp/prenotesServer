@@ -1,6 +1,7 @@
 const db = require("../helpers/db");
 const express = require("express");
 const { Op } = require("sequelize");
+const requireAuth = require("../middlewares/auth");
 const { validate } = require("../models/notesModal");
 const { validateBooks } = require("../models/booksModal");
 const multer = require("multer");
@@ -10,7 +11,6 @@ const storage = multer.diskStorage({
     cb(null, "./assets/pdfs");
   },
   filename: function (req, file, cb) {
-    console.log(file);
     cb(null, Date.now() + "notes.pdf");
   },
 });
@@ -27,7 +27,6 @@ const bookStorage = multer.diskStorage({
     cb(null, "./assets/books");
   },
   filename: function (req, file, cb) {
-    console.log(file);
     cb(null, Date.now() + "book.jpg");
   },
 });
@@ -102,7 +101,7 @@ router.get("/searchNotes?", async (req, res) => {
   }
 });
 
-router.get("/allNotes", async (req, res) => {
+router.get("/allNotes", requireAuth, async (req, res) => {
   try {
     const notes = await db.Notes.findAll({
       raw: true,
@@ -113,7 +112,6 @@ router.get("/allNotes", async (req, res) => {
       // },
     });
 
-    if (notes.length < 1) return res.status(400).json({ message: "No Data" });
     return res.json({
       message: "Success",
       notesData: notes,
@@ -123,7 +121,7 @@ router.get("/allNotes", async (req, res) => {
   }
 });
 
-router.post("/searchBooks", async (req, res) => {
+router.post("/searchBooks", requireAuth, async (req, res) => {
   try {
     const { text, id } = req.body;
 
@@ -163,7 +161,7 @@ router.post("/searchBooks", async (req, res) => {
   }
 });
 
-router.get("/allBooks/:id", async (req, res) => {
+router.get("/allBooks/:id", requireAuth, async (req, res) => {
   try {
     const id = req.params.id;
     const books = await db.Books.findAll({
@@ -190,9 +188,9 @@ router.get("/allBooks/:id", async (req, res) => {
   }
 });
 
-router.get("/notes/:iduser", async (req, res) => {
+router.get("/notes/:iduser", requireAuth, async (req, res) => {
   const id = req.params.iduser;
-  console.log(id);
+
   try {
     const notes = await db.Notes.findAll({
       where: {
@@ -200,7 +198,6 @@ router.get("/notes/:iduser", async (req, res) => {
       },
     });
 
-    if (notes.length < 1) return res.status(400).json({ message: "No Data" });
     return res.json({
       message: "Success",
       notesData: notes,
@@ -210,9 +207,9 @@ router.get("/notes/:iduser", async (req, res) => {
   }
 });
 
-router.get("/books/:id", async (req, res) => {
+router.get("/books/:id", requireAuth, async (req, res) => {
   const id = req.params.id;
-  console.log(id);
+
   try {
     const books = await db.Books.findAll({
       where: {
@@ -220,7 +217,6 @@ router.get("/books/:id", async (req, res) => {
       },
     });
 
-    if (books.length < 1) return res.status(400).json({ message: "No Data" });
     return res.json({
       message: "Success",
       booksData: books,
@@ -230,7 +226,7 @@ router.get("/books/:id", async (req, res) => {
   }
 });
 
-router.post("/pdf", async (req, res) => {
+router.post("/pdf", requireAuth, async (req, res) => {
   upload(req, res, async (err) => {
     const { error } = validate(req.body);
     if (error)
@@ -238,7 +234,6 @@ router.post("/pdf", async (req, res) => {
     if (err instanceof multer.MulterError) {
       return res.status(413).send({ error: "File Too Large" });
     } else if (err) {
-      console.log("err", err);
       return res.send({ error: "Something Went Wrong" });
     }
     try {
@@ -249,13 +244,12 @@ router.post("/pdf", async (req, res) => {
         message: "Notes Uploaded Successfully",
       });
     } catch (error) {
-      console.log(error);
       return res.status(500).json({ message: error });
     }
   });
 });
 
-router.post("/book", async (req, res) => {
+router.post("/book", requireAuth, async (req, res) => {
   bookUpload(req, res, async (err) => {
     const { error } = validateBooks(req.body);
     if (error)
@@ -263,7 +257,6 @@ router.post("/book", async (req, res) => {
     if (err instanceof multer.MulterError) {
       return res.status(413).send({ error: "File Too Large" });
     } else if (err) {
-      console.log("err", err);
       return res.send({ error: "Something Went Wrong" });
     }
     try {
@@ -274,15 +267,14 @@ router.post("/book", async (req, res) => {
         message: "Book Uploaded Successfully",
       });
     } catch (error) {
-      console.log(error);
       return res.status(500).json({ message: error });
     }
   });
 });
 
-router.delete("/delnotes/:id", async (req, res) => {
+router.delete("/delnotes/:id", requireAuth, async (req, res) => {
   const id = req.params.id;
-  console.log(id);
+
   try {
     await db.Notes.destroy({
       where: {
@@ -298,9 +290,9 @@ router.delete("/delnotes/:id", async (req, res) => {
   }
 });
 
-router.delete("/delbook/:id", async (req, res) => {
+router.delete("/delbook/:id", requireAuth, async (req, res) => {
   const id = req.params.id;
-  console.log(id);
+
   try {
     await db.Books.destroy({
       where: {

@@ -1,6 +1,7 @@
 const config = require("../config");
 const db = require("../helpers/db");
 const express = require("express");
+const requireAuth = require("../middlewares/auth");
 const jwt = require("jsonwebtoken");
 const {
   auth,
@@ -26,7 +27,7 @@ const upload = multer({ storage: storage }).single("photo");
 
 const router = express.Router();
 
-router.get("/userDetails/:id", async (req, res) => {
+router.get("/userDetails/:id", requireAuth, async (req, res) => {
   const id = req.params.id;
   try {
     const user = await db.User.findByPk(id);
@@ -112,7 +113,7 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-router.post("/changepassword", async (req, res) => {
+router.post("/changepassword", requireAuth, async (req, res) => {
   const data = req.body;
   const { error } = validateChangePwd(data);
   if (error) return res.status(400).json({ message: error.details[0].message });
@@ -136,7 +137,7 @@ router.post("/changepassword", async (req, res) => {
   }
 });
 
-router.put("/updateprofile/:id", async (req, res) => {
+router.put("/updateprofile/:id", requireAuth, async (req, res) => {
   const data = req.body;
   const id = req.params.id;
   const { error } = validateProfile(data);
@@ -163,7 +164,7 @@ router.put("/updateprofile/:id", async (req, res) => {
   }
 });
 
-router.put("/updateEdu/:id", async (req, res) => {
+router.put("/updateEdu/:id", requireAuth, async (req, res) => {
   const data = req.body;
   const id = req.params.id;
   const { error } = validateEdu(data);
@@ -184,7 +185,7 @@ router.put("/updateEdu/:id", async (req, res) => {
   }
 });
 
-router.post("/profile/:id", async (req, res) => {
+router.post("/profile/:id", requireAuth, async (req, res) => {
   upload(req, res, async (err) => {
     const id = req.params.id;
     console.log("iduser", id);

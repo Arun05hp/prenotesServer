@@ -1,6 +1,7 @@
 const db = require("../helpers/db");
 const express = require("express");
 const { Op } = require("sequelize");
+const requireAuth = require("../middlewares/auth");
 const { validateExam } = require("../models/examModal");
 const multer = require("multer");
 
@@ -29,7 +30,7 @@ const update = multer({
 
 const router = express.Router();
 
-router.get("/searchexampaper?", async (req, res) => {
+router.get("/searchexampaper?", requireAuth, async (req, res) => {
   try {
     const { string, branch } = req.query;
     console.log(req.query);
@@ -61,14 +62,12 @@ router.get("/searchexampaper?", async (req, res) => {
   }
 });
 
-router.get("/allexampaper", async (req, res) => {
+router.get("/allexampaper", requireAuth, async (req, res) => {
   try {
     const exampaper = await db.Exam.findAll({
       attributes: { exclude: ["iduser"] },
     });
 
-    if (exampaper.length < 1)
-      return res.status(400).json({ message: "No Data" });
     return res.json({
       message: "Success",
       examPaperData: exampaper,
@@ -78,7 +77,7 @@ router.get("/allexampaper", async (req, res) => {
   }
 });
 
-router.get("/exampaper/:iduser", async (req, res) => {
+router.get("/exampaper/:iduser", requireAuth, async (req, res) => {
   const id = req.params.iduser;
   console.log(id);
   try {
@@ -88,7 +87,6 @@ router.get("/exampaper/:iduser", async (req, res) => {
       },
     });
 
-    if (exam.length < 1) return res.status(400).json({ message: "No Data" });
     return res.json({
       message: "Success",
       examData: exam,
@@ -98,7 +96,7 @@ router.get("/exampaper/:iduser", async (req, res) => {
   }
 });
 
-router.post("/exampaper", async (req, res) => {
+router.post("/exampaper", requireAuth, async (req, res) => {
   upload(req, res, async (err) => {
     const { error } = validateExam(req.body);
     if (error)
@@ -127,7 +125,7 @@ router.post("/exampaper", async (req, res) => {
   });
 });
 
-router.post("/uploadsolution/:id", async (req, res) => {
+router.post("/uploadsolution/:id", requireAuth, async (req, res) => {
   update(req, res, async (err) => {
     const id = req.params.id;
     if (err instanceof multer.MulterError) {
@@ -156,7 +154,7 @@ router.post("/uploadsolution/:id", async (req, res) => {
   });
 });
 
-router.delete("/delpaper/:id", async (req, res) => {
+router.delete("/delpaper/:id", requireAuth, async (req, res) => {
   const id = req.params.id;
   console.log(id);
   try {

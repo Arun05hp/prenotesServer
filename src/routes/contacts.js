@@ -1,5 +1,6 @@
 const db = require("../helpers/db");
 const express = require("express");
+const requireAuth = require("../middlewares/auth");
 const router = express.Router();
 
 async function fetchUserInfo(item) {
@@ -14,7 +15,7 @@ async function fetchUserInfo(item) {
   return { ...item, userDetails };
 }
 
-router.get("/contacts/:iduser", async (req, res) => {
+router.get("/contacts/:iduser", requireAuth, async (req, res) => {
   const id = req.params.iduser;
 
   try {

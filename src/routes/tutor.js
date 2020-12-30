@@ -1,5 +1,7 @@
 const db = require("../helpers/db");
+const { Op } = require("sequelize");
 const express = require("express");
+const requireAuth = require("../middlewares/auth");
 const router = express.Router();
 
 const { validateTutor } = require("../models/tutorModal");
@@ -10,13 +12,13 @@ async function fetchUserInfo(item) {
     where: {
       iduser: item.iduser,
     },
-    attributes: ["institute"],
+    attributes: ["profileImg", "institute"],
   });
 
   return { ...item, ...userDetails };
 }
 
-router.get("/alltutors/:id", async (req, res) => {
+router.get("/alltutors/:id", requireAuth, async (req, res) => {
   try {
     const id = req.params.id;
     const tutors = await db.Tutor.findAll({
@@ -43,7 +45,7 @@ router.get("/alltutors/:id", async (req, res) => {
   }
 });
 
-router.get("/tutor/:iduser", async (req, res) => {
+router.get("/tutor/:iduser", requireAuth, async (req, res) => {
   const id = req.params.iduser;
 
   try {
@@ -63,7 +65,7 @@ router.get("/tutor/:iduser", async (req, res) => {
   }
 });
 
-router.post("/regtutor", async (req, res) => {
+router.post("/regtutor", requireAuth, async (req, res) => {
   const data = req.body;
   const { error } = validateTutor(data);
   if (error) return res.status(400).json({ message: error.details[0].message });
@@ -77,7 +79,7 @@ router.post("/regtutor", async (req, res) => {
   }
 });
 
-router.delete("/deltutor/:id", async (req, res) => {
+router.delete("/deltutor/:id", requireAuth, async (req, res) => {
   const id = req.params.id;
 
   try {

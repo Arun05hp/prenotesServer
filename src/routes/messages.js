@@ -1,8 +1,9 @@
 const db = require("../helpers/db");
 const express = require("express");
+const requireAuth = require("../middlewares/auth");
 const router = express.Router();
 
-router.get("/msg/:id", async (req, res) => {
+router.get("/msg/:id", requireAuth, async (req, res) => {
   const id = req.params.id;
 
   try {
