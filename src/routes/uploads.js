@@ -228,13 +228,15 @@ router.get("/books/:id", requireAuth, async (req, res) => {
 
 router.post("/pdf", requireAuth, async (req, res) => {
   upload(req, res, async (err) => {
+    console.log(req.body);
     const { error } = validate(req.body);
     if (error)
       return res.status(400).json({ message: error.details[0].message });
     if (err instanceof multer.MulterError) {
       return res.status(413).send({ error: "File Too Large" });
     } else if (err) {
-      return res.send({ error: "Something Went Wrong" });
+      console.log(err);
+      return res.status(400).send({ error: "Something Went Wrong" });
     }
     try {
       req.body.fileLink = req.file.path;
@@ -257,7 +259,8 @@ router.post("/book", requireAuth, async (req, res) => {
     if (err instanceof multer.MulterError) {
       return res.status(413).send({ error: "File Too Large" });
     } else if (err) {
-      return res.send({ error: "Something Went Wrong" });
+      console.log(err);
+      return res.status(400).send({ error: "Something Went Wrong" });
     }
     try {
       req.body.fileLink = req.file.path;

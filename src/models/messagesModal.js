@@ -8,6 +8,7 @@ function model(sequelize) {
       primaryKey: true,
     },
     messages: { type: DataTypes.JSON, allowNull: false },
+    status: { type: DataTypes.STRING, allowNull: true },
   };
   const options = {};
   return sequelize.define("messages", attributes, options);

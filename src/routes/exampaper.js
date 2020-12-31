@@ -105,7 +105,7 @@ router.post("/exampaper", requireAuth, async (req, res) => {
       return res.status(413).send({ error: "File Too Large" });
     } else if (err) {
       console.log("err", err);
-      return res.send({ error: "Something Went Wrong" });
+      return res.status(404).send({ error: "Something Went Wrong" });
     }
     try {
       req.body.quefileLink = req.files[0].path;
@@ -132,7 +132,7 @@ router.post("/uploadsolution/:id", requireAuth, async (req, res) => {
       return res.status(413).send({ error: "File Too Large" });
     } else if (err) {
       console.log("err", err);
-      return res.send({ error: "Something Went Wrong" });
+      return res.status(404).send({ error: "Something Went Wrong" });
     }
 
     try {
